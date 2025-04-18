@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baixar Apps - KwanzaPlay</title>
+  <script type="module" src="firebase-config.js"></script>
+</head>
+<body>
+  <h1>Baixar Apps e Ganhar Pontos</h1>
+  <div id="apps">
+    <div>
+      <p>WhatsFast - 100 Pontos</p>
+      <button onclick="ganharPontos(100)">Baixar</button>
+    </div>
+  </div>
+  <script type="module">
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+    import { app } from './firebase-config.js';
+
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    window.ganharPontos = function(pontosGanhos) {
+      const user = auth.currentUser;
+      if (user) {
+        const pontosRef = ref(db, 'usuarios/' + user.uid);
+        get(pontosRef).then((snapshot) => {
+          if (snapshot.exists()) {
+            const pontosAtuaisTemp = snapshot.val().pontos || 0;
+            update(pontosRef, {
+              pontos: pontosAtuaisTemp + pontosGanhos
+            }).then(() => {
+              alert(`Você ganhou ${pontosGanhos} pontos!`);
+            });
+          }
+        });
+      }
+    }
+  </script>
+</body>
+</html>
